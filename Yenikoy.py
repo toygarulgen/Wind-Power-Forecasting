@@ -1,8 +1,6 @@
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt 
 from sklearn.model_selection import GridSearchCV
-from WorldWeatherPy import DetermineListOfAttributes
-from WorldWeatherPy import HistoricalLocationWeather
 from wwo_hist import retrieve_hist_data
 import pandas as pd
 import xgboost
@@ -103,7 +101,7 @@ Target = pd.DataFrame(Target['Rüzgar'])
 frequency=1
 start_date = '01-JAN-2021'
 end_date = '07-SEP-2021'
-api_key = '1aa24f5e16be4fc7bba204316210609'
+api_key = 'd076fee119134d61b5962021210711'
 location_list = ['40.218531,26.832031']
 hist_weather_data = retrieve_hist_data(api_key,location_list,start_date,end_date,frequency,location_label = False,
                                        export_csv = False, store_df = True)
@@ -175,15 +173,15 @@ for train_index, test_index in tscv.split(df):
     plt.grid(True)
     plt.show()
     k = k + 1
-    if k == 3: #sonra 3
+    if k == 3:
         break
 
 #%% TEST SET
 
 frequency=1
-start_date = today
-end_date = tomorrow
-api_key = '1aa24f5e16be4fc7bba204316210609'
+start_date = yesterday
+end_date = today
+api_key = 'd076fee119134d61b5962021210711'
 location_list = ['40.218531,26.832031']
 hist_weather_data2 = retrieve_hist_data(api_key, location_list, start_date, end_date, frequency, location_label = False, 
                                         export_csv = False, store_df = True)

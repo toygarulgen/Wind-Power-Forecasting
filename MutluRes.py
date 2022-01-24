@@ -1,8 +1,8 @@
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt 
 from sklearn.model_selection import GridSearchCV
-from WorldWeatherPy import DetermineListOfAttributes
-from WorldWeatherPy import HistoricalLocationWeather
+# from WorldWeatherPy import DetermineListOfAttributes
+# from WorldWeatherPy import HistoricalLocationWeather
 from wwo_hist import retrieve_hist_data
 import pandas as pd
 import xgboost

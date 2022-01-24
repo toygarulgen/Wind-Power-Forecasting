@@ -1,5 +1,3 @@
-from catboost import CatBoostRegressor
-from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_absolute_error
 import pandas as pd
@@ -10,13 +8,6 @@ from sklearn.model_selection import TimeSeriesSplit
 from wwo_hist import retrieve_hist_data
 from datetime import datetime, timedelta
 from seffaflik.elektrik import uretim
-from scipy import interpolate
-import xgboost as xgb
-from sklearn.metrics import accuracy_score
-from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
-from xgboost import XGBRegressor
-from hyperopt.pyll import scope
-import time
 import math
 
 def rmse(predictions, targets):
@@ -118,8 +109,8 @@ Target = pd.DataFrame(Target['Rüzgar'])
 
 frequency=1
 start_date = '01-JUL-2020'
-end_date = yesterday
-api_key = '1aa24f5e16be4fc7bba204316210609'
+end_date = '06-SEP-2021'
+api_key = 'beb3f237e0274253b3764922210712'
 location_list = ['41.143107,28.317183']
 hist_weather_data = retrieve_hist_data(api_key, location_list,
                                         start_date, end_date, 
@@ -154,18 +145,111 @@ df['Cos_windspeedKmph'] = np.cos(df['windspeedKmph'])
 
 df['wind_scalar^2'] = df['windspeedKmph']**2
 df['wind_scalar^3'] = df['windspeedKmph']**3
-# df['wind_scalar^4'] = df['windspeedKmph']**4
 
-
-df['DateTime'] = rng
+df.index = df.index.rename('DateTime')
+df = pd.merge(df, rng, on="DateTime", how="outer")
 
 Target = pd.merge(Target, rng, on="DateTime", how="outer")
-df = df.set_index('DateTime')
 
-Target = Target.set_index('DateTime')
 Target = Target.sort_values(by='DateTime', ascending=True)
 Target['Rüzgar'] = Target['Rüzgar'].interpolate(method='pad', limit=1)
 
+df = df.loc[(df['DateTime'] < "2020-08-13 14:00:00") | (df['DateTime'] > "2020-08-14 16:00:00")]
+df = df.loc[(df['DateTime'] < "2020-08-23 00:00:00") | (df['DateTime'] > "2020-08-29 10:00:00")]
+df = df.loc[(df['DateTime'] < "2020-09-06 12:00:00") | (df['DateTime'] > "2020-09-06 21:00:00")]
+df = df.loc[(df['DateTime'] < "2020-10-19 08:00:00") | (df['DateTime'] > "2020-10-19 14:00:00")]
+df = df.loc[(df['DateTime'] < "2020-12-07 23:00:00") | (df['DateTime'] > "2020-12-14 01:00:00")]
+df = df.loc[(df['DateTime'] < "2020-12-14 03:00:00") | (df['DateTime'] > "2020-12-18 01:00:00")]
+df = df.loc[(df['DateTime'] < "2020-12-30 07:00:00") | (df['DateTime'] > "2020-12-30 11:00:00")]
+df = df.loc[(df['DateTime'] < "2021-01-10 22:00:00") | (df['DateTime'] > "2021-01-16 13:00:00")]
+df = df.loc[(df['DateTime'] < "2021-01-30 15:00:00") | (df['DateTime'] > "2021-01-31 09:00:00")]
+df = df.loc[(df['DateTime'] < "2021-02-13 11:00:00") | (df['DateTime'] > "2021-02-13 17:00:00")]
+df = df.loc[(df['DateTime'] < "2021-02-20 20:00:00") | (df['DateTime'] > "2021-02-22 00:00:00")]
+df = df.loc[(df['DateTime'] < "2021-03-06 07:00:00") | (df['DateTime'] > "2021-03-06 14:00:00")]
+df = df.loc[(df['DateTime'] < "2021-03-08 11:00:00") | (df['DateTime'] > "2021-03-08 15:00:00")]
+df = df.loc[(df['DateTime'] < "2021-03-16 07:00:00") | (df['DateTime'] > "2021-03-16 12:00:00")]
+df = df.loc[(df['DateTime'] < "2021-03-19 16:00:00") | (df['DateTime'] > "2021-03-19 22:00:00")]
+df = df.loc[(df['DateTime'] < "2021-03-22 07:00:00") | (df['DateTime'] > "2021-03-22 15:00:00")]
+df = df.loc[(df['DateTime'] < "2021-04-19 14:00:00") | (df['DateTime'] > "2021-04-19 18:00:00")]
+df = df.loc[(df['DateTime'] < "2021-04-21 15:00:00") | (df['DateTime'] > "2021-04-21 18:00:00")]
+df = df.loc[(df['DateTime'] < "2021-05-02 00:00:00") | (df['DateTime'] > "2021-05-04 00:00:00")]
+df = df.loc[(df['DateTime'] < "2021-05-18 00:00:00") | (df['DateTime'] > "2021-05-23 00:00:00")]
+df = df.loc[(df['DateTime'] < "2021-05-25 20:00:00") | (df['DateTime'] > "2021-05-25 01:00:00")]
+df = df.loc[(df['DateTime'] < "2021-05-28 05:00:00") | (df['DateTime'] > "2021-05-28 10:00:00")]
+df = df.loc[(df['DateTime'] < "2021-06-10 00:00:00") | (df['DateTime'] > "2021-06-17 07:00:00")]
+df = df.loc[(df['DateTime'] < "2021-07-09 15:00:00") | (df['DateTime'] > "2021-07-10 15:00:00")]
+df = df.loc[(df['DateTime'] < "2021-07-11 06:00:00") | (df['DateTime'] > "2021-07-14 05:00:00")]
+df = df.loc[(df['DateTime'] < "2021-07-21 04:00:00") | (df['DateTime'] > "2021-07-21 08:00:00")]
+df = df.loc[(df['DateTime'] < "2021-07-23 20:00:00") | (df['DateTime'] > "2021-07-24 08:00:00")]
+df = df.loc[(df['DateTime'] < "2021-07-25 13:00:00") | (df['DateTime'] > "2021-07-26 10:00:00")]
+df = df.loc[(df['DateTime'] < "2021-07-29 02:00:00") | (df['DateTime'] > "2021-07-29 05:00:00")]
+df = df.loc[(df['DateTime'] < "2021-08-04 07:00:00") | (df['DateTime'] > "2021-08-04 10:00:00")]
+df = df.loc[(df['DateTime'] < "2021-08-07 04:00:00") | (df['DateTime'] > "2021-08-07 09:00:00")]
+df = df.loc[(df['DateTime'] < "2021-08-12 18:00:00") | (df['DateTime'] > "2021-08-14 07:00:00")]
+df = df.loc[(df['DateTime'] < "2021-08-15 04:00:00") | (df['DateTime'] > "2021-08-15 09:00:00")]
+df = df.loc[(df['DateTime'] < "2021-08-17 06:00:00") | (df['DateTime'] > "2021-08-17 15:00:00")]
+df = df.loc[(df['DateTime'] < "2021-08-20 05:00:00") | (df['DateTime'] > "2021-08-20 12:00:00")]
+df = df.loc[(df['DateTime'] < "2021-08-21 23:00:00") | (df['DateTime'] > "2021-08-22 05:00:00")]
+df = df.loc[(df['DateTime'] < "2021-08-24 04:00:00") | (df['DateTime'] > "2021-08-24 08:00:00")]
+df = df.loc[(df['DateTime'] < "2021-08-29 21:00:00") | (df['DateTime'] > "2021-08-30 06:00:00")]
+df = df.loc[(df['DateTime'] < "2021-08-31 14:00:00") | (df['DateTime'] > "2021-09-03 09:00:00")]
+df = df.loc[(df['DateTime'] < "2021-09-04 01:00:00") | (df['DateTime'] > "2021-09-05 10:00:00")]
+
+
+Target = Target.loc[(Target['DateTime'] < "2020-08-13 14:00:00") | (Target['DateTime'] > "2020-08-14 16:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2020-08-23 00:00:00") | (Target['DateTime'] > "2020-08-29 10:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2020-09-06 12:00:00") | (Target['DateTime'] > "2020-09-06 21:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2020-10-19 08:00:00") | (Target['DateTime'] > "2020-10-19 14:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2020-12-07 23:00:00") | (Target['DateTime'] > "2020-12-14 01:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2020-12-14 03:00:00") | (Target['DateTime'] > "2020-12-18 01:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2020-12-30 07:00:00") | (Target['DateTime'] > "2020-12-30 11:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-01-10 22:00:00") | (Target['DateTime'] > "2021-01-16 13:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-01-30 15:00:00") | (Target['DateTime'] > "2021-01-31 09:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-02-13 11:00:00") | (Target['DateTime'] > "2021-02-13 17:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-02-20 20:00:00") | (Target['DateTime'] > "2021-02-22 00:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-03-06 07:00:00") | (Target['DateTime'] > "2021-03-06 14:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-03-08 11:00:00") | (Target['DateTime'] > "2021-03-08 15:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-03-16 07:00:00") | (Target['DateTime'] > "2021-03-16 12:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-03-19 16:00:00") | (Target['DateTime'] > "2021-03-19 22:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-03-22 07:00:00") | (Target['DateTime'] > "2021-03-22 15:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-04-19 14:00:00") | (Target['DateTime'] > "2021-04-19 18:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-04-21 15:00:00") | (Target['DateTime'] > "2021-04-21 18:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-05-02 00:00:00") | (Target['DateTime'] > "2021-05-04 00:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-05-18 00:00:00") | (Target['DateTime'] > "2021-05-23 00:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-05-25 20:00:00") | (Target['DateTime'] > "2021-05-25 01:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-05-28 05:00:00") | (Target['DateTime'] > "2021-05-28 10:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-06-10 00:00:00") | (Target['DateTime'] > "2021-06-17 07:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-07-09 15:00:00") | (Target['DateTime'] > "2021-07-10 15:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-07-11 06:00:00") | (Target['DateTime'] > "2021-07-14 05:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-07-21 04:00:00") | (Target['DateTime'] > "2021-07-21 08:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-07-23 20:00:00") | (Target['DateTime'] > "2021-07-24 08:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-07-25 13:00:00") | (Target['DateTime'] > "2021-07-26 10:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-07-29 02:00:00") | (Target['DateTime'] > "2021-07-29 05:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-08-04 07:00:00") | (Target['DateTime'] > "2021-08-04 10:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-08-07 04:00:00") | (Target['DateTime'] > "2021-08-07 09:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-08-12 18:00:00") | (Target['DateTime'] > "2021-08-14 07:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-08-15 04:00:00") | (Target['DateTime'] > "2021-08-15 09:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-08-17 06:00:00") | (Target['DateTime'] > "2021-08-17 15:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-08-20 05:00:00") | (Target['DateTime'] > "2021-08-20 12:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-08-21 23:00:00") | (Target['DateTime'] > "2021-08-22 05:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-08-24 04:00:00") | (Target['DateTime'] > "2021-08-24 08:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-08-29 21:00:00") | (Target['DateTime'] > "2021-08-30 06:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-08-31 14:00:00") | (Target['DateTime'] > "2021-09-03 09:00:00")]
+Target = Target.loc[(Target['DateTime'] < "2021-09-04 01:00:00") | (Target['DateTime'] > "2021-09-05 10:00:00")]
+
+df = df.set_index('DateTime')
+Target = Target.set_index('DateTime')
+
+# yeni = pd.DataFrame(df['windspeedKmph'])
+# yeni["WindGustKmph"] = df["WindGustKmph"]
+# yeni["Rüzgar"] = Target["Rüzgar"]
+# yeni["WinddirDegree"] = df["winddirDegree"]
+
+
+# plt.plot(yeni['Rüzgar'].values, linewidth=1.5, label="Production")
+# plt.plot(yeni['windspeedKmph'].values, linewidth=1.5, label="windspeedKmph")
+# plt.plot(yeni['WindGustKmph'].values, linewidth=1.5, label="WindGustKmph")
+# plt.legend(loc='best',fancybox=True, shadow=True)
 
 #%% TRAINING AND VALIDATION SET
 df = df.values
@@ -257,8 +341,8 @@ for train_index, test_index in tscv.split(df):
     plt.plot(x_ax, list(y_test), linewidth=1.5, label="original")
     plt.plot(x_ax, list(Xgbpred), linewidth=1.5, label="predicted")
     plt.title("y-test and y-predicted data")
-    plt.xlabel('X-axis')
-    plt.ylabel('TL/MWhr')
+    plt.xlabel('Time')
+    plt.ylabel('MW')
     plt.legend(loc='best',fancybox=True, shadow=True)
     plt.grid(True)
     plt.show()
@@ -271,7 +355,7 @@ for train_index, test_index in tscv.split(df):
 frequency=1
 start_date = today
 end_date = tomorrow
-api_key = '1aa24f5e16be4fc7bba204316210609'
+api_key = 'beb3f237e0274253b3764922210712'
 location_list = ['41.1431070,28.3171830']
 
 hist_weather_data2 = retrieve_hist_data(api_key, location_list,
@@ -316,6 +400,12 @@ X_test2 = X_test2.values
 
 Xgbpred2 = XGBoostRegression(X_train,y_train,X_test2)
 
+for ij in range(len(Xgbpred2)):
+    if Xgbpred2[ij] > 5.00:
+        Xgbpred2[ij]=5
+    elif Xgbpred2[ij] < 0:
+        Xgbpred2[ij]=0
+        
 x = range(len(Xgbpred2))
 ax = plt.figure().add_subplot(111)
 ax.plot(x, list(Xgbpred2), linewidth=1.5)
@@ -329,7 +419,6 @@ ax.grid(True)
 # Xgbpred2 = round_up(Xgbpred2, decimals=1)
 Xgbpred2 = pd.DataFrame(Xgbpred2)
 Xgbpred2.to_excel('GAZİ.xlsx')
-
 
 
 
